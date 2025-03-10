@@ -24,7 +24,7 @@ router.post("/clients/register", (req, res) => {
   const {nom_prenom, tel, mail, mdp } = req.body;
 
   // Vérifier si l'email existe déjà
-  db.query("SELECT * FROM clients WHERE mail = ?", [mail], (err, result) => {
+  db.query("SELECT * FROM client WHERE mail = ?", [mail], (err, result) => {
     if (err) return res.status(500).json({ message: "Erreur serveur" });
 
     if (result.length > 0) {
@@ -40,8 +40,8 @@ router.post("/clients/register", (req, res) => {
 
       // Insérer le nouveau client
       db.query(
-        "INSERT INTO clients (ID_client, nom_prenom, tel, mail, mdp) VALUES (?, ?, ?, ?, ?)",
-        [ID-client, nom_prenom, tel, mail, hash],
+        "INSERT INTO client (nom_prenom, tel, mail, mdp) VALUES (?, ?, ?, ?)",
+        [nom_prenom, tel, mail, hash],
         (err, result) => {
           if (err)
             return res
