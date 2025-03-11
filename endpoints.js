@@ -190,7 +190,7 @@ router.get('/products', (req, res) => {
 // Route pour récupérer les produits avec un solde = 1
 router.get('/products/solde', (req, res) => {
   // Requête SQL pour récupérer les produits où la colonne solde = 1
-  const query = 'SELECT * FROM produit WHERE solde = 1';
+  const query = 'SELECT * FROM produit WHERE solde = 1 limit 10';
 
   db.query(query, (err, results) => {
     if (err) {
