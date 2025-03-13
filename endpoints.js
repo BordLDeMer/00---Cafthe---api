@@ -68,9 +68,10 @@ router.post("/clients/register", (req, res) => {
  * }
  */
 router.post("/clients/login", (req, res) => {
-  const { mail, mdp } = req.body;
+  const { email, mot_de_passe } = req.body;
+  console.log(res.body)
 
-  db.query("SELECT * FROM client WHERE mail = ?", [mail], (err, result) => {
+  db.query("SELECT * FROM client WHERE mail = ?", [email], (err, result) => {
     if (err) return res.status(500).json({ message: "Erreur serveur" });
     if (result.length === 0) {
       return res.status(401).json({ message: "Identifiant incorrect" });
@@ -79,7 +80,7 @@ router.post("/clients/login", (req, res) => {
     const client = result[0];
 
     /* Vérification du mot de passe */
-    bcrypt.compare(mdp, client.mdp, (err, isMatch) => {
+    bcrypt.compare(mot_de_passe, client.mdp, (err, isMatch) => {
       if (err) return res.status(500).json({ message: "Erreur serveur" });
       if (!isMatch)
         return res.status(401).json({ message: "Mot de passe incorrect" });
@@ -200,6 +201,34 @@ router.get('/products/solde', (req, res) => {
     res.json(results);
   });
 });
+
+// Route pour récupérer un produit aléatoire par rayon
+router.get('/random-product-by-rayon', (req, res) => {
+  const query = `SELECT p.ID_produit, p.ID_rayon
+                 FROM produit p
+                        INNER JOIN (
+                   SELECT ID_rayon, MIN(ID_produit) AS ID_produit
+                   FROM (
+                          SELECT ID_rayon, ID_produit,
+                                 ROW_NUMBER() OVER(PARTITION BY ID_rayon ORDER BY RAND()) AS rn
+                          FROM produit
+                        ) AS ranked
+                   WHERE rn = 1
+                   GROUP BY ID_rayon
+                 ) AS selected_produit
+                                   ON p.ID_rayon = selected_produit.ID_rayon
+                                     AND p.ID_produit = selected_produit.ID_produit
+                 ORDER BY p.ID_rayon;`;
+
+  db.query(query, (err, result) => {
+    if (err) {
+      res.status(500).send({ error: 'Error retrieving random products by rayon' });
+      return;
+    }
+    res.json(result);
+  });
+});
+
 
 module.exports = router;
 
