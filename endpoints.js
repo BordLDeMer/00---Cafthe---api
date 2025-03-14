@@ -229,6 +229,23 @@ router.get('/random-product-by-rayon', (req, res) => {
   });
 });
 
+//----------------------------------------------------------------------------------------------------------------------
+// Route pour récupérer la dernière commande d'un utilisateur par son ID
+router.get("/commande/client/ouvert/:id", (req, res) => {
+  db.query (
+      "SELECT * FROM commande AS C WHERE C.ID_client = ? ORDER BY C.ID_commande DESC LIMIT 1",
+      [req.params.id],
+      (error, result) => {
+        if (error) {
+          return res.status(500).send({ message: 'Erreur lors de la récupération de la commande' });
+        }
+        if (result.length === 0) {
+          return res.status(404).json({message : "Commande non trouvée"})
+        }
+        res.json(result[0])
+      })
+})
 
+//----------------------------------------------------------------------------------------------------------------------
 module.exports = router;
 
