@@ -9,7 +9,7 @@ const router = express.Router();
 /* npm install jsonwebtoken*/
 
 //----------------------------------------------------------------------------------------------------------------------
-/**
+/**npm
  * ➤ ROUTE : Inscription d'un nouveau client
  * ➤ URL : POST /api/clients/register
  * ➤ Body attendu (JSON) :
