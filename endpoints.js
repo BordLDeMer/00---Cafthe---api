@@ -89,7 +89,7 @@ router.post("/clients/login", (req, res) => {
       const token = sign(
         { id: client.ID_client, mail: client.mail },
         process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES_IN },
+        { expiresIn: "30d" },
       );
 
       res.json({
@@ -237,7 +237,7 @@ router.get("/commande/client/ouvert/:id", (req, res) => {
       [req.params.id],
       (error, result) => {
         if (error) {
-          return res.status(500).send({ message: 'Erreur lors de la récupération de la commande' });
+          return res.status(500).json({ message: 'Erreur lors de la récupération de la commande' });
         }
         if (result.length === 0) {
           return res.status(404).json({message : "Commande non trouvée"})
@@ -247,5 +247,54 @@ router.get("/commande/client/ouvert/:id", (req, res) => {
 })
 
 //----------------------------------------------------------------------------------------------------------------------
+// Route pour enregistrer ou ajouter à une ligne de panier
+// Infos : ID_commande, ID_produit
+router.post("/ligne/ajouter", verifyToken, (req, res) => {
+  const {ID_commande, ID_produit} = req.body;
+
+  db.query(`SELECT * FROM ligne_panier WHERE ID_commande = ? AND ID_produit = ?`,
+      [ID_commande, ID_produit],
+      (error, result) => {
+    if (error){
+      return res.status(500).json({message: "Erreur lors de la récupération de la ligne de panier"})
+    }
+    if (result.length === 0){
+      db.query(`INSERT INTO ligne_panier (qte_pdt_ligne_panier, ID_commande, ID_produit) VALUES (1, ?, ?)`,
+          [ID_commande, ID_produit],
+          (error, result) => {
+        if (error){
+          return res.status(500).json({message: "Erreur lors de la création d'une nouvelle ligne de panier"})
+        }
+        res.status(201).json({message: "Ajout réussi", ID_ligne_panier: result.insertId})
+          })
+    } else {
+      db.query("UPDATE ligne_panier SET qte_pdt_ligne_panier = qte_pdt_ligne_panier + 1 WHERE ID_commande = ? AND ID_produit = ?",
+          [ID_commande, ID_produit],
+          (error, result) => {
+        if (error){
+          return res.status(500).json({message: "Erreur lors de la création d'une nouvelle ligne de panier"})
+        }
+          })
+    }
+      })
+})
+
+//-----------------------------------------------------------------------------------------------------------------------
+// Route pour récupérer toutes les lignes panier d'une commande
+// Infos : ID_commande
+router.get("/ligne/commande/:ID_commande", (req, res) => {
+  const {ID_commande} = req.params
+
+  db.query("SELECT * FROM ligne_panier WHERE ID_commande = ?",
+      [ID_commande], (error, result) => {
+    if (error){
+      return res.status(500).json({message: "Erreur lors de la récupération des lignes de panier"})
+    }
+        console.log(result)
+    res.json(result)
+      })
+})
+
+
 module.exports = router;
 
