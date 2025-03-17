@@ -119,7 +119,7 @@ router.get("/produit", (req, res) => {
 });
 
 
-//recuprer les produit par leur rayon
+//recupérer les produits par leur rayon
 
 router.get("/produit/rayon/:id", (req, res) => {
   const { id } = req.params;
@@ -160,12 +160,6 @@ router.get("/produit/:ID_produit", (req, res) => {
  * ➤ ROUTE PROTÉGÉE : Récupérer les commandes d'un client connecté
  */
 
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Route pour afficher que les cafés sur la page café
- */
-
-
 // Route pour récupérer les produits contenant "café" dans la désignation
 router.get('/products', (req, res) => {
   const filter = req.query.filter || '';
@@ -202,6 +196,7 @@ router.get('/products/solde', (req, res) => {
   });
 });
 
+//-----------------------------------------------------------------------------------------------------------------------
 // Route pour récupérer un produit aléatoire par rayon
 router.get('/random-product-by-rayon', (req, res) => {
   const query = `SELECT p.ID_produit, p.ID_rayon
@@ -294,7 +289,6 @@ router.get("/ligne/commande/:ID_commande", (req, res) => {
     res.json(result)
       })
 })
-
 
 module.exports = router;
 
