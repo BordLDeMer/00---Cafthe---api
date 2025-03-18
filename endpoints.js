@@ -21,7 +21,7 @@ const router = express.Router();
  * }
  */
 router.post("/clients/register", (req, res) => {
-  const {nom_prenom, tel, mail, mdp } = req.body;
+  const { nom_prenom, tel, mail, mdp } = req.body;
 
   // Vérifier si l'email existe déjà
   db.query("SELECT * FROM client WHERE mail = ?", [mail], (err, result) => {
@@ -58,7 +58,6 @@ router.post("/clients/register", (req, res) => {
   });
 });
 
-
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * ➤ ROUTE : Connexion d'un client (Génération de JWT)
@@ -69,7 +68,7 @@ router.post("/clients/register", (req, res) => {
  */
 router.post("/clients/login", (req, res) => {
   const { email, mot_de_passe } = req.body;
-  console.log(res.body)
+  console.log(res.body);
 
   db.query("SELECT * FROM client WHERE mail = ?", [email], (err, result) => {
     if (err) return res.status(500).json({ message: "Erreur serveur" });
@@ -106,7 +105,6 @@ router.post("/clients/login", (req, res) => {
   });
 });
 
-
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * ➤ ROUTE : Récupérer tous les produits
@@ -118,15 +116,18 @@ router.get("/produit", (req, res) => {
   });
 });
 
-
 //recupérer les produits par leur rayon
 
 router.get("/produit/rayon/:id", (req, res) => {
   const { id } = req.params;
-  db.query("SELECT * FROM `produit` WHERE ID_rayon = ?;", [id],(err, result) => {
-    if (err) return res.status(500).json({ message: "Erreur serveur" });
-    res.json(result);
-  });
+  db.query(
+    "SELECT * FROM `produit` WHERE ID_rayon = ?;",
+    [id],
+    (err, result) => {
+      if (err) return res.status(500).json({ message: "Erreur serveur" });
+      res.json(result);
+    },
+  );
 });
 //----------------------------------------------------------------------------------------------------------------------
 /**
@@ -137,17 +138,21 @@ router.get("/produit/rayon/:id", (req, res) => {
 router.get("/produit/:ID_produit", (req, res) => {
   const { ID_produit } = req.params;
 
-  db.query("SELECT * FROM produit WHERE ID_produit = ?", [ID_produit], (err, result) => {
-    if (err) {
-      return res.status(500).json({ message: "Erreur serveur" });
-    }
+  db.query(
+    "SELECT * FROM produit WHERE ID_produit = ?",
+    [ID_produit],
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({ message: "Erreur serveur" });
+      }
 
-    //if (result.length === 0) {
-    //  return res.status(404).json({ message: "Produit non trouvé" });
-    //}
+      //if (result.length === 0) {
+      //  return res.status(404).json({ message: "Produit non trouvé" });
+      //}
 
-    res.json(result[0]); // Retourner le premier (et unique) résultat
-  });
+      res.json(result[0]); // Retourner le premier (et unique) résultat
+    },
+  );
 });
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -161,16 +166,18 @@ router.get("/produit/:ID_produit", (req, res) => {
  */
 
 // Route pour récupérer les produits contenant "café" dans la désignation
-router.get('/products', (req, res) => {
-  const filter = req.query.filter || '';
+router.get("/products", (req, res) => {
+  const filter = req.query.filter || "";
 
   // Requête SQL pour récupérer les produits dont la désignation contient le mot "café"
-  const query = 'SELECT * FROM produit WHERE designation_produit LIKE ?';
+  const query = "SELECT * FROM produit WHERE designation_produit LIKE ?";
 
   db.query(query, [`%${filter}%`], (err, results) => {
     if (err) {
-      console.error('Erreur lors de la récupération des produits:', err);
-      return res.status(500).send({ message: 'Erreur lors de la récupération des produits' });
+      console.error("Erreur lors de la récupération des produits:", err);
+      return res
+        .status(500)
+        .send({ message: "Erreur lors de la récupération des produits" });
     }
     res.json(results);
   });
@@ -183,14 +190,21 @@ router.get('/products', (req, res) => {
  */
 
 // Route pour récupérer les produits avec un solde = 1
-router.get('/products/solde', (req, res) => {
+router.get("/products/solde", (req, res) => {
   // Requête SQL pour récupérer les produits où la colonne solde = 1
-  const query = 'SELECT * FROM produit WHERE solde = 1 limit 10';
+  const query = "SELECT * FROM produit WHERE solde = 1 limit 10";
 
   db.query(query, (err, results) => {
     if (err) {
-      console.error('Erreur lors de la récupération des produits avec solde 1:', err);
-      return res.status(500).send({ message: 'Erreur lors de la récupération des produits avec solde 1' });
+      console.error(
+        "Erreur lors de la récupération des produits avec solde 1:",
+        err,
+      );
+      return res
+        .status(500)
+        .send({
+          message: "Erreur lors de la récupération des produits avec solde 1",
+        });
     }
     res.json(results);
   });
@@ -198,7 +212,7 @@ router.get('/products/solde', (req, res) => {
 
 //-----------------------------------------------------------------------------------------------------------------------
 // Route pour récupérer un produit aléatoire par rayon
-router.get('/random-product-by-rayon', (req, res) => {
+router.get("/random-product-by-rayon", (req, res) => {
   const query = `SELECT p.ID_produit, p.ID_rayon
                  FROM produit p
                         INNER JOIN (
@@ -217,7 +231,9 @@ router.get('/random-product-by-rayon', (req, res) => {
 
   db.query(query, (err, result) => {
     if (err) {
-      res.status(500).send({ error: 'Error retrieving random products by rayon' });
+      res
+        .status(500)
+        .send({ error: "Error retrieving random products by rayon" });
       return;
     }
     res.json(result);
@@ -227,68 +243,168 @@ router.get('/random-product-by-rayon', (req, res) => {
 //----------------------------------------------------------------------------------------------------------------------
 // Route pour récupérer la dernière commande d'un utilisateur par son ID
 router.get("/commande/client/ouvert/:id", (req, res) => {
-  db.query (
-      "SELECT * FROM commande AS C WHERE C.ID_client = ? ORDER BY C.ID_commande DESC LIMIT 1",
-      [req.params.id],
-      (error, result) => {
-        if (error) {
-          return res.status(500).json({ message: 'Erreur lors de la récupération de la commande' });
-        }
-        if (result.length === 0) {
-          return res.status(404).json({message : "Commande non trouvée"})
-        }
-        res.json(result[0])
-      })
-})
+  db.query(
+    "SELECT * FROM commande AS C WHERE C.ID_client = ? ORDER BY C.ID_commande DESC LIMIT 1",
+    [req.params.id],
+    (error, result) => {
+      if (error) {
+        return res
+          .status(500)
+          .json({ message: "Erreur lors de la récupération de la commande" });
+      }
+      if (result.length === 0) {
+        return res.status(404).json({ message: "Commande non trouvée" });
+      }
+      res.json(result[0]);
+    },
+  );
+});
 
 //----------------------------------------------------------------------------------------------------------------------
 // Route pour enregistrer ou ajouter à une ligne de panier
 // Infos : ID_commande, ID_produit
 router.post("/ligne/ajouter", verifyToken, (req, res) => {
-  const {ID_commande, ID_produit} = req.body;
+  const { ID_commande, ID_produit } = req.body;
 
-  db.query(`SELECT * FROM ligne_panier WHERE ID_commande = ? AND ID_produit = ?`,
-      [ID_commande, ID_produit],
-      (error, result) => {
-    if (error){
-      return res.status(500).json({message: "Erreur lors de la récupération de la ligne de panier"})
-    }
-    if (result.length === 0){
-      db.query(`INSERT INTO ligne_panier (qte_pdt_ligne_panier, ID_commande, ID_produit) VALUES (1, ?, ?)`,
+  db.query(
+    `SELECT * FROM ligne_panier WHERE ID_commande = ? AND ID_produit = ?`,
+    [ID_commande, ID_produit],
+    (error, result) => {
+      if (error) {
+        return res
+          .status(500)
+          .json({
+            message: "Erreur lors de la récupération de la ligne de panier",
+          });
+      }
+      if (result.length === 0) {
+        db.query(
+          `INSERT INTO ligne_panier (qte_pdt_ligne_panier, ID_commande, ID_produit) VALUES (1, ?, ?)`,
           [ID_commande, ID_produit],
           (error, result) => {
-        if (error){
-          return res.status(500).json({message: "Erreur lors de la création d'une nouvelle ligne de panier"})
-        }
-        res.status(201).json({message: "Ajout réussi", ID_ligne_panier: result.insertId})
-          })
-    } else {
-      db.query("UPDATE ligne_panier SET qte_pdt_ligne_panier = qte_pdt_ligne_panier + 1 WHERE ID_commande = ? AND ID_produit = ?",
+            if (error) {
+              return res
+                .status(500)
+                .json({
+                  message:
+                    "Erreur lors de la création d'une nouvelle ligne de panier",
+                });
+            }
+            res
+              .status(201)
+              .json({
+                message: "Ajout réussi",
+                ID_ligne_panier: result.insertId,
+              });
+          },
+        );
+      } else {
+        db.query(
+          "UPDATE ligne_panier SET qte_pdt_ligne_panier = qte_pdt_ligne_panier + 1 WHERE ID_commande = ? AND ID_produit = ?",
           [ID_commande, ID_produit],
           (error, result) => {
-        if (error){
-          return res.status(500).json({message: "Erreur lors de la création d'une nouvelle ligne de panier"})
-        }
-          })
-    }
-      })
-})
+            if (error) {
+              return res
+                .status(500)
+                .json({
+                  message:
+                    "Erreur lors de la création d'une nouvelle ligne de panier",
+                });
+            }
+          },
+        );
+      }
+    },
+  );
+});
 
+//----------------------------------------------------------------------------------------------------------------------
+// Route pour supprimer un produit à une ligne de panier
+// Infos : ID_commande, ID_produit
+router.post("/ligne/supprimer", verifyToken, (req, res) => {
+  const { ID_commande, ID_produit } = req.body;
+
+  db.query(
+    `SELECT * FROM ligne_panier WHERE ID_commande = ? AND ID_produit = ?`,
+    [ID_commande, ID_produit],
+    (error, result) => {
+      if (error) {
+        return res
+          .status(500)
+          .json({
+            message: "Erreur lors de la récupération de la ligne de panier",
+          });
+      }
+      if (result.length === 0) {
+        // La ligne n'existe pas, rien à supprimer
+        return res
+          .status(404)
+          .json({ message: "Produit non trouvé dans le panier" });
+      } else {
+        // La ligne existe
+        const ligne = result[0];
+        if (ligne.qte_pdt_ligne_panier <= 1) {
+          // Si la quantité est 1 ou moins, on supprime complètement la ligne
+          db.query(
+            "DELETE FROM ligne_panier WHERE ID_commande = ? AND ID_produit = ?",
+            [ID_commande, ID_produit],
+            (error, result) => {
+              if (error) {
+                return res
+                  .status(500)
+                  .json({
+                    message:
+                      "Erreur lors de la suppression complète de la ligne",
+                  });
+              }
+              return res
+                .status(200)
+                .json({ message: "Produit supprimé du panier" });
+            },
+          );
+        } else {
+          // Sinon, on décrémente la quantité
+          db.query(
+            "UPDATE ligne_panier SET qte_pdt_ligne_panier = qte_pdt_ligne_panier - 1 WHERE ID_commande = ? AND ID_produit = ?",
+            [ID_commande, ID_produit],
+            (error, result) => {
+              if (error) {
+                return res
+                  .status(500)
+                  .json({
+                    message: "Erreur lors de la mise à jour de la quantité",
+                  });
+              }
+              return res
+                .status(200)
+                .json({ message: "Quantité du produit réduite" });
+            },
+          );
+        }
+      }
+    },
+  );
+});
 //-----------------------------------------------------------------------------------------------------------------------
 // Route pour récupérer toutes les lignes panier d'une commande
 // Infos : ID_commande
 router.get("/ligne/commande/:ID_commande", (req, res) => {
-  const {ID_commande} = req.params
+  const { ID_commande } = req.params;
 
-  db.query("SELECT * FROM ligne_panier WHERE ID_commande = ?",
-      [ID_commande], (error, result) => {
-    if (error){
-      return res.status(500).json({message: "Erreur lors de la récupération des lignes de panier"})
-    }
-        console.log(result)
-    res.json(result)
-      })
-})
+  db.query(
+    "SELECT * FROM ligne_panier WHERE ID_commande = ?",
+    [ID_commande],
+    (error, result) => {
+      if (error) {
+        return res
+          .status(500)
+          .json({
+            message: "Erreur lors de la récupération des lignes de panier",
+          });
+      }
+      res.json(result);
+    },
+  );
+});
 
 module.exports = router;
-
