@@ -200,11 +200,9 @@ router.get("/products/solde", (req, res) => {
         "Erreur lors de la récupération des produits avec solde 1:",
         err,
       );
-      return res
-        .status(500)
-        .send({
-          message: "Erreur lors de la récupération des produits avec solde 1",
-        });
+      return res.status(500).send({
+        message: "Erreur lors de la récupération des produits avec solde 1",
+      });
     }
     res.json(results);
   });
@@ -271,11 +269,9 @@ router.post("/ligne/ajouter", verifyToken, (req, res) => {
     [ID_commande, ID_produit],
     (error, result) => {
       if (error) {
-        return res
-          .status(500)
-          .json({
-            message: "Erreur lors de la récupération de la ligne de panier",
-          });
+        return res.status(500).json({
+          message: "Erreur lors de la récupération de la ligne de panier",
+        });
       }
       if (result.length === 0) {
         db.query(
@@ -283,19 +279,15 @@ router.post("/ligne/ajouter", verifyToken, (req, res) => {
           [ID_commande, ID_produit],
           (error, result) => {
             if (error) {
-              return res
-                .status(500)
-                .json({
-                  message:
-                    "Erreur lors de la création d'une nouvelle ligne de panier",
-                });
-            }
-            res
-              .status(201)
-              .json({
-                message: "Ajout réussi",
-                ID_ligne_panier: result.insertId,
+              return res.status(500).json({
+                message:
+                  "Erreur lors de la création d'une nouvelle ligne de panier",
               });
+            }
+            res.status(201).json({
+              message: "Ajout réussi",
+              ID_ligne_panier: result.insertId,
+            });
           },
         );
       } else {
@@ -304,12 +296,10 @@ router.post("/ligne/ajouter", verifyToken, (req, res) => {
           [ID_commande, ID_produit],
           (error, result) => {
             if (error) {
-              return res
-                .status(500)
-                .json({
-                  message:
-                    "Erreur lors de la création d'une nouvelle ligne de panier",
-                });
+              return res.status(500).json({
+                message:
+                  "Erreur lors de la création d'une nouvelle ligne de panier",
+              });
             }
           },
         );
@@ -329,11 +319,9 @@ router.post("/ligne/supprimer", verifyToken, (req, res) => {
     [ID_commande, ID_produit],
     (error, result) => {
       if (error) {
-        return res
-          .status(500)
-          .json({
-            message: "Erreur lors de la récupération de la ligne de panier",
-          });
+        return res.status(500).json({
+          message: "Erreur lors de la récupération de la ligne de panier",
+        });
       }
       if (result.length === 0) {
         // La ligne n'existe pas, rien à supprimer
@@ -350,12 +338,9 @@ router.post("/ligne/supprimer", verifyToken, (req, res) => {
             [ID_commande, ID_produit],
             (error, result) => {
               if (error) {
-                return res
-                  .status(500)
-                  .json({
-                    message:
-                      "Erreur lors de la suppression complète de la ligne",
-                  });
+                return res.status(500).json({
+                  message: "Erreur lors de la suppression complète de la ligne",
+                });
               }
               return res
                 .status(200)
@@ -369,11 +354,9 @@ router.post("/ligne/supprimer", verifyToken, (req, res) => {
             [ID_commande, ID_produit],
             (error, result) => {
               if (error) {
-                return res
-                  .status(500)
-                  .json({
-                    message: "Erreur lors de la mise à jour de la quantité",
-                  });
+                return res.status(500).json({
+                  message: "Erreur lors de la mise à jour de la quantité",
+                });
               }
               return res
                 .status(200)
@@ -396,11 +379,9 @@ router.get("/ligne/commande/:ID_commande", (req, res) => {
     [ID_commande],
     (error, result) => {
       if (error) {
-        return res
-          .status(500)
-          .json({
-            message: "Erreur lors de la récupération des lignes de panier",
-          });
+        return res.status(500).json({
+          message: "Erreur lors de la récupération des lignes de panier",
+        });
       }
       res.json(result);
     },
@@ -408,3 +389,26 @@ router.get("/ligne/commande/:ID_commande", (req, res) => {
 });
 
 module.exports = router;
+
+//----------------------------------------------------------------------------------------------------------------------
+// Route pour afficher la commande
+router.get("/commande/client/:id", (req, res) => {
+  const { id } = req.params;
+
+  db.query(
+    "SELECT * FROM commande WHERE ID_client = ?",
+    [id],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).json({ message: "Erreur serveur" });
+      }
+      if (result.length === 0) {
+        return res
+          .status(404)
+          .json({ message: "Le client n'a passé de commande" });
+      }
+      res.json(result);
+    },
+  );
+});
