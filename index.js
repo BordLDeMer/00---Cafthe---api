@@ -6,7 +6,12 @@ const routes = require("./endpoints"); // Importation des routes
 
 const app = express();
 app.use(express.json());
-//app.use(cors());
+var corsOptions = {
+  origin: true, //"http://localhost:8090"
+  credentials: true,
+  exposedHeaders: ["set-cookie"],
+};
+app.use(cors(corsOptions));
 
 // Utilisation des routes définies
 app.use("/api", routes);
